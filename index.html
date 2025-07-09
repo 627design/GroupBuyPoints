@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>社区团购积分存折</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background: #f1f1f1;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+
+        .search-box {
+            padding: 15px 25px; /* 增加右边距 */
+            background: #f8f8f8;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-box input {
+            width: 95%; /* 略微减少宽度以留出右边空隙 */
+            padding: 10px 15px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        .update-time {
+            font-size: 0.85em;
+            color: #999;
+            text-align: center;
+            padding: 8px 0;
+            background: #fafafa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 排行榜样式 */
+        #pointsLedger {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #pointsLedger li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        #pointsLedger li:hover {
+            background-color: #f1f1f1;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9em;
+            font-weight: bold;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .name {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .points {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        #pointsLedger li:nth-child(-n+10) {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+
+        #pointsLedger li:nth-child(-n+10) .points {
+            color: #e67e22;
+        }
+
+        /* 规则内容样式 */
+        .rules {
+            padding: 20px;
+        }
+
+        .rules p,
+        .rules ul {
+            line-height: 1.6;
+            font-size: 0.95em;
+            margin: 0 0 15px 0;
+        }
+
+        .rules h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">社区团购积分存折</div>
+
+    <!-- Tab 切换导航 -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('rank')">排行榜</div>
+        <div class="tab" onclick="switchTab('rule')">积分规则</div>
+    </div>
+
+    <!-- Tab 内容 -->
+    <div id="rank" class="tab-content active">
+        <div class="update-time">数据更新时间：2025年7月9日</div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="请输入姓名查找..." oninput="filterUsers()" />
+        </div>
+        <ul id="pointsLedger">
+            <!-- 数据由 JS 动态填充 -->
+        </ul>
+    </div>
+
+    <div id="rule" class="tab-content rules">
+        <h3>积分规则说明</h3>
+        <p>欢迎参与社区团购活动，以下是我们的积分获取与使用规则：</p>
+        <ul>
+            <li>✅ 每消费满 10 元可获得 1 积分</li>
+            <li>✅ 每次参团可额外奖励 5 积分</li>
+            <li>✅ 邀请好友注册并下单，您将获得 20 积分奖励</li>
+            <li>✅ 积分可用于兑换商品或抵扣现金（100积分 = 1元）</li>
+            <li>⏳ 积分有效期为 1 年，到期自动清零，请及时使用</li>
+        </ul>
+        <p>如有疑问，请联系客服微信：xxx 或电话：138xxxx1234</p>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabId) {
+        const tabs = document.querySelectorAll('.tab');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => tab.classList.remove('active'));
+        contents.forEach(content => content.classList.remove('active'));
+
+        document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    // 初始化排行榜数据
+    let users = [
+        { name: "张三", points: 150 },
+        { name: "李四", points: 145 },
+        { name: "王五", points: 140 },
+        { name: "赵六", points: 135 },
+        { name: "钱七", points: 130 },
+        { name: "孙八", points: 125 },
+        { name: "周九", points: 120 },
+        { name: "吴十", points: 115 },
+        { name: "郑十一", points: 110 },
+        { name: "王十二", points: 105 },
+        { name: "陈十三", points: 100 },
+        { name: "刘十四", points: 95 }
+    ];
+
+    // 获取中文/英文名的首字母
+    function getInitial(name) {
+        if (!name) return '?';
+        const firstChar = name.trim()[0];
+        if (/[\u4e00-\u9fa5]/.test(firstChar)) {
+            // 中文转拼音首字母（简单模拟）
+            const map = {
+                张: 'Z', 李: 'L', 王: 'W', 赵: 'Z', 钱: 'Q',
+                孙: 'S', 周: 'Z', 吴: 'W', 郑: 'Z', 陈: 'C', 刘: 'L'
+            };
+            return map[firstChar] || firstChar.toUpperCase();
+        }
+        return firstChar.toUpperCase();
+    }
+
+    // 生成随机颜色
+    function getRandomColor() {
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#C5B7F5', '#FFA500'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function renderUsers(data) {
+        const ledger = document.getElementById("pointsLedger");
+        ledger.innerHTML = "";
+        data.forEach((user, index) => {
+            const initial = getInitial(user.name);
+            const color = getRandomColor();
+
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <div class="avatar" style="background-color:${color}">${initial}</div>
+                <div class="info">
+                    <div class="name">${user.name}</div>
+                </div>
+                <div class="points">${user.points}</div>
+            `;
+            ledger.appendChild(li);
+        });
+    }
+
+    function filterUsers() {
+        const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+        if (!keyword) {
+            renderUsers(users);
+            return;
+        }
+
+        const filtered = users.filter(user =>
+            user.name.toLowerCase().includes(keyword)
+        );
+        renderUsers(filtered);
+    }
+
+    // 页面加载时渲染所有用户
+    document.addEventListener("DOMContentLoaded", function () {
+        users.sort((a, b) => b.points - a.points); // 按积分排序
+        renderUsers(users);
+    });
+</script>
+
+</body>
+</html>
